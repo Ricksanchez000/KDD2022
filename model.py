@@ -420,9 +420,9 @@ class OpDQNNetwork(DQNNetwork):
         q_next = self.target_net(b_s_).detach()
         q_target = b_r + self.GAMMA * q_next.max(1)[0].view(self.BATCH_SIZE, 1)
         loss = self.loss_func(q_eval, q_target)
-        self.optimizer.zero_grad()
+        optimizer.zero_grad()
         loss.backward()
-        self.optimizer.step()
+        optimizer.step()
         # prob = self.forward(s1)
         # m = Categorical(prob)
         # logp = m.log_prob(op.reshape(-1)).reshape(-1, 1)
@@ -438,7 +438,7 @@ class OpDQNNetwork(DQNNetwork):
         # loss = actor_loss + critic_loss + self.ENT_WEIGHT * entropy_loss
         # optimizer.zero_grad()
         # loss.backward()
-        optimizer.step()
+        #optimizer.step()
         # info(
         #     ' | name=model_op' +
         #     ' | loss={:.5f}'.format(loss.cpu().item()) +
