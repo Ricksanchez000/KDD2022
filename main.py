@@ -138,7 +138,7 @@ def train(param):
                     continue
             feature_names = list(Dg.columns)
             new_per = ENV.get_reward(Dg)
-            reward = new_per - old_per
+            reward = new_per - old_per #original ariticle design is using utility diff, but here is only using F1 and 1-RAE diff
             r_c1, r_op, r_c2 = param['a'] * reward, param['b'] * reward, param['c'] * reward
             if new_per > best_per:
                 best_step = step
@@ -213,7 +213,12 @@ if __name__ == '__main__':
         if not os.path.exists('./log/' + trail_id + '/' +
                               params['name']):
             os.mkdir('./log/' + trail_id + '/' + params['name'])
-        log_file = './log/' + trail_id + '/' + params['name'] + '/' + start_time + '.log'
+        #log_file = './log/' + trail_id + '/' + params['name'] + '/' + start_time + '.log'
+        
+        import time
+        start_time = time.strftime('%Y-%m-%d_%H-%M-%S')  # Example: "2024-12-06_11-17-30"
+        log_file = './log/' + trail_id + '/' + params['name'] + '/' + start_time + '.log'        
+        
         logging.basicConfig(filename=log_file, level=logging_level[params[
             'log_level']], format=
                             '%(asctime)s - %(levelname)s : %(message)s', datefmt=

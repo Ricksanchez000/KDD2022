@@ -109,7 +109,8 @@ def _cluster_features(features, y, cluster_num=2):
     k = int(np.sqrt(features.shape[1]))
     features = feature_distance(features, y)
     features = features.reshape(features.shape[0], -1)
-    clustering = AgglomerativeClustering(n_clusters=k, affinity='precomputed', linkage='single').fit(features)
+    #clustering = AgglomerativeClustering(n_clusters=k, affinity='precomputed', linkage='single').fit(features)
+    clustering = AgglomerativeClustering(n_clusters=k,  metric='precomputed', linkage='single').fit(features)
     labels = clustering.labels_
     clusters = defaultdict(list)
     for ind, item in enumerate(labels):

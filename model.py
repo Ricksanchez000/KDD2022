@@ -194,8 +194,8 @@ class ClusterDQNNetwork(DQNNetwork):
             assert clusters is not None
             assert X is not None
             assert self.select_mode
-            state_emb = feature_state_generation(pd.DataFrame(X))
-            state_emb = torch.FloatTensor(state_emb)
+            state_emb = feature_state_generation(pd.DataFrame(X)) #这里构建整个group的展开两次的REP，
+            state_emb = torch.FloatTensor(state_emb)              #然后转化为张量  
             if self.cuda_info:
                 state_emb = state_emb.cuda()
         else:
