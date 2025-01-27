@@ -1,3 +1,4 @@
+#可直接运行版本，但是reward方面或许可以优化。
 import os
 os.environ['NUMEXPR_MAX_THREADS'] = '64'
 os.environ['NUMEXPR_NUM_THREADS'] = '64'
