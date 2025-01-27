@@ -36,7 +36,7 @@ class RandomClusterReplay(Replay):
 
     def store_transition(self, mems):
         s, a, r, s_, a_ = mems
-        transition = np.hstack((s, a, [r], s_, a_))
+        transition = np.hstack((s, a, [r], s_, a_)) #这里store好像是没什么问题，都是dim = 64
         index = self.memory_counter % self.MEMORY_CAPACITY
         self.memory[index, :] = transition
         self.memory_counter += 1
