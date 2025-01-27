@@ -314,9 +314,9 @@ class ClusterDQNNetwork(DQNNetwork):
         q_next = self.target_net(net_input_)
         q_target = b_r + self.GAMMA * q_next.view(self.BATCH_SIZE, 1) #这里没有定义batch_size,
         loss = self.loss_func(q_eval, q_target)
-        self.optimizer.zero_grad()
+        optimizer.zero_grad()
         loss.backward()
-        self.optimizer.step()
+        optimizer.step()
 
         # actor_loss = []
         # critic_loss = []
