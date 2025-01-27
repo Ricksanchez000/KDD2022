@@ -229,7 +229,7 @@ class ClusterDQNNetwork(DQNNetwork):
         return q_vals_, select_cluster_state_list, state_emb
 
     def store_transition(self, s1, a1, r, s2, a2):
-        self.memory.store_transition((s1, a1, r, s2, a2))
+        self.memory.store_transition((s1, a1, r, s2, a2))  #在这里存储experience
 
     def select_action(self, clusters, X, feature_names, op=None, cached_state_embed=None, cached_cluster_state=None,
                       for_next=False, steps_done=0):
