@@ -337,9 +337,9 @@ class ClusterDQNNetwork(DQNNetwork):
 
         # loss = actor_loss + critic_loss + self.ENT_WEIGHT * entropy_loss
 
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        #optimizer.zero_grad()
+        #loss.backward()
+        #optimizer.step()
         # if self.select_mode:
         #     name = 'model_c1'
         # else:
