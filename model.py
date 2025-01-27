@@ -217,10 +217,10 @@ class ClusterDQNNetwork(DQNNetwork):
             select_cluster_state_list[cluster_index] = select_cluster_state
             if for_next:
                 q_val = self.get_q_value_next(state_emb, select_cluster_state)
-                print(f"Shape of state_emb: {state_emb}; cluster_index {cluster_index}; shape of select_cluster_state: {select_cluster_state.shape}")
+                print(f"Shape of state_emb: {state_emb.shape}; cluster_index {cluster_index}; shape of select_cluster_state: {select_cluster_state.shape}")
             else:
                 q_val = self.get_q_value(state_emb, select_cluster_state)#它最后是把这两个concate在了一起，然后送入网络中，select_cluster_state成为了ACTION_DIM
-                print(f"Shape of state_emb: {state_emb}; cluster_index {cluster_index}; shape of select_cluster_state: {select_cluster_state.shape}") 
+                print(f"Shape of state_emb: {state_emb.shape}; cluster_index {cluster_index}; shape of select_cluster_state: {select_cluster_state.shape}") 
             q_vals.append(q_val.detach())  # th
             cluster_list.append(cluster_index)
         q_vals_ = [None] * len(q_vals)
