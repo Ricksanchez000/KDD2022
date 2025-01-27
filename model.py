@@ -188,7 +188,8 @@ class ClusterDQNNetwork(DQNNetwork):
             return self.operation_emb[op]
         else:  # is embedding
             return op
-
+    #Q(state,cluster) 所以DIM是 64 + 64
+    #Q(s,a)这里的a对应的dim即x中提取的cluster子集的REP = 64
     def forward(self, clusters=None, X=None, cached_state_emb=None, cached_cluster_state=None, for_next=False):
         if cached_state_emb is None:
             assert clusters is not None
@@ -205,6 +206,8 @@ class ClusterDQNNetwork(DQNNetwork):
             iter = cached_cluster_state.items()
         else:
             iter = clusters.items()
+        #遍历clusters来计算对应的Q(state,cluster)
+        #传入计算q值的维度就是 64 + 64 = 128 = (len(state_emb) + len(select_cluster_state))
         for cluster_index, value in iter:
             if clusters is None:
                 select_cluster_state = value
@@ -243,6 +246,8 @@ class ClusterDQNNetwork(DQNNetwork):
 
     def _select_head(self, clusters, X, feature_names, cached_state_embed=None, cached_cluster_state=None,
                      for_next=False, steps_done=0):
+        #cluster应该是选出的一组features
+        #x应该是原始feature set
         q_vals, select_cluster_state_list, state_op_emb = self.forward(clusters, X, for_next=for_next)  # act_probs: [bs, act_dim], state_value: [bs, 1]
         eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END
                                         ) * math.exp(-1.0 * steps_done / self.EPS_DECAY)

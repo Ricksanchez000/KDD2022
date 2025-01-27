@@ -25,8 +25,8 @@ class Replay:
 class RandomClusterReplay(Replay):
     def __init__(self, size, batch_size, state_shape, device, op_dim=0):
         super().__init__(size, batch_size, device)
-        #self.memory = np.zeros((self.MEMORY_CAPACITY, state_shape * 2 + state_shape *
-        #                        2 + op_dim * 2 + 1))
+        self.memory = np.zeros((self.MEMORY_CAPACITY, state_shape * 2 + state_shape *
+                                2 + op_dim * 2 + 1))
         
         #所以，要么后续传入fc1计算q_value有问题，要么改这里的DIM
         #因为没有理由传入128的维度？64和64+19 = state_dim + op_dim ? 那问题在于，第一个agent接收的输入是什么？
@@ -35,12 +35,17 @@ class RandomClusterReplay(Replay):
         #tail_agent接收的是REP(F1) cat REP(o1) cat REP (C1)
         #所以，第一个agent接收的 REP(F1)应该是 64
         
-        self.memory = np.zeros((self.MEMORY_CAPACITY, state_shape * 2 + op_dim * 2 + 1)) 
-
+        #self.memory = np.zeros((self.MEMORY_CAPACITY, state_shape * 2 + op_dim * 2 + 1)) #64*2 + 15*2 + 1 = 159 
+        #如果op_dim=0，则64*2 + 0*2 + 1 = 129
+        #不行，经过检查发现存储了a1,维度是64，所以需要是64*2 + 64*2 = 1 = 257
+        #如果是op_dim = 15,则是64*2 + 64*2 + 15*2 = 287 是在
+        
+        #所以现在需要看的是a为什么需要占64的维度？
+        
         
         
         self.STATE_DIM = state_shape
-        self.ACTION_DIM = op_dim
+        self.ACTION_DIM = state_shape
         if self.cuda_info:
             self.mem1 = self.mem1.cuda()
             self.mem2 = self.mem2.cuda()
@@ -66,7 +71,14 @@ class RandomClusterReplay(Replay):
         b_a_ = torch.LongTensor(b_memory[:, -self.ACTION_DIM:])
         return b_s, b_a, b_r, b_s_, b_a_
 
-
+        '''
+        b_s = b_memory[:, :64]         # (batch_size, 64)
+        b_a = b_memory[:, 64:128]      # (batch_size, 64)
+        b_r = b_memory[:, 128:129]     # (batch_size, 1)
+        b_s_ = b_memory[:, 129:193]    # (batch_size, 64)
+        b_a_ = b_memory[:, 193:257]    # (batch_size, 64)
+        '''
+        
 class RandomOperationReplay(Replay):
     def __init__(self, size, batch_size, state_dim, device):
         super().__init__(size, batch_size, device)

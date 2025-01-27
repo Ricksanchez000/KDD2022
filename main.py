@@ -122,6 +122,7 @@ def train(param):
             info(f'current cluster : {clusters}')
             acts1, action_emb, f_names1, f_cluster1, action_list, state_emb = \
                 model_cluster1.select_action(clusters=clusters, X=Dg.values[:, :-1], feature_names=feature_names, steps_done=steps_done)
+            #研究这里返回的action_emb，看看是什么情况？
             op, op_name = model_op.select_operation(action_emb, steps_done=steps_done)
 
             if op_name in O1:
