@@ -25,8 +25,20 @@ class Replay:
 class RandomClusterReplay(Replay):
     def __init__(self, size, batch_size, state_shape, device, op_dim=0):
         super().__init__(size, batch_size, device)
-        self.memory = np.zeros((self.MEMORY_CAPACITY, state_shape * 2 + state_shape *
-                                2 + op_dim * 2 + 1))
+        #self.memory = np.zeros((self.MEMORY_CAPACITY, state_shape * 2 + state_shape *
+        #                        2 + op_dim * 2 + 1))
+        
+        #所以，要么后续传入fc1计算q_value有问题，要么改这里的DIM
+        #因为没有理由传入128的维度？64和64+19 = state_dim + op_dim ? 那问题在于，第一个agent接收的输入是什么？
+        #哦！我明白了，第一个agent接收的是REP(feature_set)=64
+        #op_agent接收的是REP(F1) cat REP(Ct) = 64
+        #tail_agent接收的是REP(F1) cat REP(o1) cat REP (C1)
+        #所以，第一个agent接收的 REP(F1)应该是 64
+        
+        self.memory = np.zeros((self.MEMORY_CAPACITY, state_shape * 2 + op_dim * 2 + 1)) 
+
+        
+        
         self.STATE_DIM = state_shape
         self.ACTION_DIM = op_dim
         if self.cuda_info:
@@ -48,7 +60,7 @@ class RandomClusterReplay(Replay):
         b_a = torch.LongTensor(b_memory[:, self.STATE_DIM:self.STATE_DIM +
                                                           self.ACTION_DIM])
         b_r = torch.FloatTensor(b_memory[:, self.STATE_DIM + self.
-                                ACTION_DIM:self.STATE_DIM + self.ACTION_DIM + 1])
+                                ACTION_DIM:self.STATE_DIM + self.ACTION_DIM + 1]) # only 1 slice，contails the simgle reward
         b_s_ = torch.FloatTensor(b_memory[:, self.STATE_DIM + self.
                                  ACTION_DIM + 1:self.STATE_DIM * 2 + self.ACTION_DIM + 1])
         b_a_ = torch.LongTensor(b_memory[:, -self.ACTION_DIM:])
