@@ -75,8 +75,8 @@ def train(param):
     ENT_WEIGHT = param['ent_weight']
     LR = 0.01
     init_w = param['init_w']
-    model_cluster1 = ClusterDQNNetwork(#state_dim=STATE_DIM, cluster_state_dim=STATE_DIM, hidden_dim=STATE_DIM * 2,
-                                       state_dim=STATE_DIM, cluster_state_dim=0, hidden_dim=STATE_DIM * 2,
+    model_cluster1 = ClusterDQNNetwork(state_dim=STATE_DIM, cluster_state_dim=STATE_DIM, hidden_dim=STATE_DIM * 2,
+                                       #state_dim=STATE_DIM, cluster_state_dim=0, hidden_dim=STATE_DIM * 2,
                                         memory=cluster1_mem,
                                         ent_weight=ENT_WEIGHT, select='head',
                                         gamma=0.99,
