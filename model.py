@@ -45,7 +45,7 @@ class ClusterNet(nn.Module):
         self.out.weight.data.normal_(-init_w, init_w)
 
     def forward(self, x):
-        x = self.fc1(x)
+        x = self.fc1(x)     #这里有问题，输入x的维度是8*68， 但是fc1layer是128*128 为啥呢？先看看X是什么
         x = F.relu(x)
         action_value = self.out(x)
         return action_value
@@ -300,7 +300,7 @@ class ClusterDQNNetwork(DQNNetwork):
         self.learn_step_counter += 1
         b_s, b_a, b_r, b_s_, b_a_ = self.memory.sample()
         net_input = torch.cat((b_s, b_a), axis=1)
-        q_eval = self.eval_net(net_input)
+        q_eval = self.eval_net(net_input) # 8*64 128*128 矩阵维度不对应
         net_input_ = torch.cat((b_s_, b_a_), axis=1)
         q_next = self.target_net(net_input_)
         q_target = b_r + self.GAMMA * q_next.view(self.BATCH_SIZE, 1)

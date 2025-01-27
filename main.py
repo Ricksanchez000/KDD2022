@@ -75,7 +75,8 @@ def train(param):
     ENT_WEIGHT = param['ent_weight']
     LR = 0.01
     init_w = param['init_w']
-    model_cluster1 = ClusterDQNNetwork(state_dim=STATE_DIM, cluster_state_dim=STATE_DIM, hidden_dim=STATE_DIM * 2,
+    model_cluster1 = ClusterDQNNetwork(#state_dim=STATE_DIM, cluster_state_dim=STATE_DIM, hidden_dim=STATE_DIM * 2,
+                                       state_dim=STATE_DIM, cluster_state_dim=0, hidden_dim=STATE_DIM * 2,
                                         memory=cluster1_mem,
                                         ent_weight=ENT_WEIGHT, select='head',
                                         gamma=0.99,
@@ -160,7 +161,7 @@ def train(param):
             model_op.store_transition(action_emb, op, r_op, action_emb_)
             if model_cluster1.memory.memory_counter >= model_cluster1.memory.MEMORY_CAPACITY:
                 info('start to learn in model_c1')
-                model_cluster1.learn(optimizer_c1)
+                model_cluster1.learn(optimizer_c1)  #这里mat不对应，8*64 128*128
             if model_cluster2.memory.memory_counter >= model_cluster2.memory.MEMORY_CAPACITY:
                 info('start to learn in model_c2')
                 model_cluster2.learn(optimizer_c2)

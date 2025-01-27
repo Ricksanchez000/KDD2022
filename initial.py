@@ -37,7 +37,7 @@ def init_param():
     parser.add_argument('--a', type=float, default=1, help='a')
     parser.add_argument('--b', type=float, default=1, help='b')
     parser.add_argument('--c', type=float, default=1, help='c')
-    parser.add_argument('--hidden-size', type=int, default=64)
+    parser.add_argument('--hidden-size', type=int, default=64) 
     parser.add_argument('--batch-size', type=int, default=8)
     parser.add_argument('--replay-strategy', type=str, default='random')
     parser.add_argument('--ent_weight', type=float, default=1e-3, help='weight factor for entropy loss')
