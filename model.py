@@ -301,6 +301,7 @@ class ClusterDQNNetwork(DQNNetwork):
             self.target_net.load_state_dict(self.eval_net.state_dict())
         self.learn_step_counter += 1
         b_s, b_a, b_r, b_s_, b_a_ = self.memory.sample()
+        info(f'Sampled memory : s1: {b_s.shape} ; b_a: {b_a.shape} ; b_r: {b_r} ; b_s_: {b_s_.shape} ; b_a_: {b_a_.shape}')
         net_input = torch.cat((b_s, b_a), axis=1)
         q_eval = self.eval_net(net_input) # 8*64 128*128 矩阵维度不对应
         net_input_ = torch.cat((b_s_, b_a_), axis=1)
