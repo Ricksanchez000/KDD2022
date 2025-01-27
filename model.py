@@ -70,6 +70,7 @@ class DQNNetwork(nn.Module):
         self.init_w = init_w
         self.TARGET_REPLACE_ITER = 100
         self.loss_func = nn.MSELoss()
+        self.BATCH_SIZE = memory.BATCH_SIZE #后续需要用到batch_size，仅在memory中被定义，需要取出
         for k, v in operation_emb.items():
             if self.cuda_info:
                 v = v.cuda()
@@ -311,7 +312,7 @@ class ClusterDQNNetwork(DQNNetwork):
         q_eval = self.eval_net(net_input) # 8*64 128*128 矩阵维度不对应
         net_input_ = torch.cat((b_s_, b_a_), axis=1)
         q_next = self.target_net(net_input_)
-        q_target = b_r + self.GAMMA * q_next.view(self.BATCH_SIZE, 1)
+        q_target = b_r + self.GAMMA * q_next.view(self.BATCH_SIZE, 1) #这里没有定义batch_size,
         loss = self.loss_func(q_eval, q_target)
         self.optimizer.zero_grad()
         loss.backward()
