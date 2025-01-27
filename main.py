@@ -157,7 +157,7 @@ def train(param):
                                                  op=op_name_, cached_state_embed=state_emb_,
                                                  cached_cluster_state=action_list_, for_next=True)
                 model_cluster2.store_transition(state_emb2, action_emb2, r_c2, state_emb2_, action_emb2_) #s1, a1, r, s2, a2
-            info(f'model_cluster 1 stored memory : s1: {state_emb} ; a1: {action_emb} ; r: {r_c1} ; s2: {state_emb_} ; a2: {action_emb_}')
+            info(f'model_cluster 1 stored memory : s1: {state_emb.shape} ; a1: {action_emb.shape} ; r: {r_c1} ; s2: {state_emb_.shape} ; a2: {action_emb_.shape}')
             model_cluster1.store_transition(state_emb, action_emb, r_c1, state_emb_, action_emb_)
             model_op.store_transition(action_emb, op, r_op, action_emb_)
             if model_cluster1.memory.memory_counter >= model_cluster1.memory.MEMORY_CAPACITY:
