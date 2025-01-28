@@ -69,7 +69,7 @@ class RandomClusterReplay(Replay):
                                                         +  self.ACTION_DIM])
         b_r = torch.FloatTensor(b_memory[:, self.STATE_DIM + self.op_dim + self.
                                 ACTION_DIM:self.STATE_DIM + self.op_dim + self.ACTION_DIM + 1]) # only 1 slice，contails the simgle reward
-        b_s_ = torch.FloatTensor(b_memory[:, self.STATE_DIM + self.op_dim + self.ACTION_DIM + 1:self.STATE_DIM * 2 + self.op_dim*2 self.ACTION_DIM + 1])
+        b_s_ = torch.FloatTensor(b_memory[:, self.STATE_DIM + self.op_dim + self.ACTION_DIM + 1 :self.STATE_DIM * 2 + self.op_dim*2 + self.ACTION_DIM + 1])
         b_a_ = torch.LongTensor(b_memory[:, -self.ACTION_DIM:])
         return b_s, b_a, b_r, b_s_, b_a_
 
