@@ -82,19 +82,20 @@ def train(param):
                                         ent_weight=ENT_WEIGHT, select='head',
                                         gamma=0.99,
                                         device=cuda_info, init_w=init_w)
-    '''
+    
     model_cluster2 = ClusterDQNNetwork(state_dim=STATE_DIM + OP_DIM, cluster_state_dim=STATE_DIM, hidden_dim=(STATE_DIM + OP_DIM) * 2,
                                         memory=cluster2_mem,
                                         ent_weight=ENT_WEIGHT, select='tail',
                                         gamma=0.99,
                                         device=cuda_info, init_w=init_w)
+    
     '''
     model_cluster2 = ClusterDQNNetwork(state_dim=STATE_DIM, cluster_state_dim=STATE_DIM, hidden_dim=STATE_DIM * 2,
                                         memory=cluster2_mem,
                                         ent_weight=ENT_WEIGHT, select='tail',
                                         gamma=0.99,
                                         device=cuda_info, init_w=init_w)
-
+    '''
     model_op = OpDQNNetwork(state_dim=STATE_DIM, cluster_state_dim=STATE_DIM, hidden_dim=STATE_DIM * 2,
                              memory=op_mem, ent_weight=ENT_WEIGHT, gamma=0.99, device=cuda_info, init_w=init_w)
     if cuda_info:
