@@ -184,6 +184,12 @@ def downstream_task_new(data, task_type):
         return -1
 
 
+
+
+
+
+
+
 def downstream_task(data, task_type, metric_type, state_num=10):
     X = data.iloc[:, :-1]
     y = data.iloc[:, -1].astype(int)

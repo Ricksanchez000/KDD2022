@@ -82,8 +82,14 @@ def train(param):
                                         ent_weight=ENT_WEIGHT, select='head',
                                         gamma=0.99,
                                         device=cuda_info, init_w=init_w)
-
+    '''
     model_cluster2 = ClusterDQNNetwork(state_dim=STATE_DIM + OP_DIM, cluster_state_dim=STATE_DIM, hidden_dim=(STATE_DIM + OP_DIM) * 2,
+                                        memory=cluster2_mem,
+                                        ent_weight=ENT_WEIGHT, select='tail',
+                                        gamma=0.99,
+                                        device=cuda_info, init_w=init_w)
+    '''
+    model_cluster2 = ClusterDQNNetwork(state_dim=STATE_DIM, cluster_state_dim=STATE_DIM, hidden_dim=STATE_DIM * 2,
                                         memory=cluster2_mem,
                                         ent_weight=ENT_WEIGHT, select='tail',
                                         gamma=0.99,
@@ -108,7 +114,8 @@ def train(param):
     info(f'start training, the original performance is {old_per}')
     D_original = Dg.copy()
     steps_done = 0
-    FEATURE_LIMIT = Dg.shape[1] * param['enlarge_num']
+    FEATURE_LIMIT = Dg.shape[1] * param['enlarge_num']  # column number * 4
+    info(f'feature_limit = {FEATURE_LIMIT}')
     best_step = -1
     best_episode = -1
     training_start_time = time.time()
@@ -171,7 +178,7 @@ def train(param):
             if model_op.memory.memory_counter >= model_op.memory.MEMORY_CAPACITY:
                 info('start to learn in model_op')
                 model_op.learn(optimizer_op)
-            if Dg.shape[1] > FEATURE_LIMIT:
+            if Dg.shape[1] > FEATURE_LIMIT: #当feature数量超过 column_num * 4 时，用mutual_info限定在这个范围内
                 selector = SelectKBest(mutual_info_regression, k=FEATURE_LIMIT)\
                     .fit(Dg.iloc[:, :-1], Dg.iloc[:, -1])
                 cols = selector.get_support()

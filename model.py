@@ -44,6 +44,11 @@ class ClusterNet(nn.Module):
         self.out = nn.Linear(HIDDEN_DIM, 1)
         self.out.weight.data.normal_(-init_w, init_w)
 
+        #对于Cluster2来说，hidden_dim = (STATE_DIM + OP_DIM) * 2 = (64 + 15)*2 = 158
+        #同时，输入的STATE_DIM = STATE_DIM + OP_DIM = 64 + 15 = 79
+        #ACTION_DIM保持不变为 64 ， 则fc1初始化时，input_dim = 79 + 64 = 143
+        #但是，我们当前输入的x仍然是 64 + 64 = 128
+                
     def forward(self, x):
         x = self.fc1(x)     #这里有问题，输入x的维度是8*68， 但是fc1layer是128*128 为啥呢？先看看X是什么
         x = F.relu(x)
@@ -302,13 +307,16 @@ class ClusterDQNNetwork(DQNNetwork):
         return acts, action_emb, f_names, f_cluster, select_cluster_state_list, state_op_emb
 
     # 𝐿 =∑𝑙𝑜𝑔𝜋𝜃(𝑠𝑡, 𝑎𝑡)(𝑟 + 𝛾𝑉(𝑠𝑡 + 1)−𝑉(𝑠𝑡))
-    def learn(self, optimizer):
+    def learn(self, optimizer,op_mem=None):
         if self.learn_step_counter % self.TARGET_REPLACE_ITER == 0:
             self.target_net.load_state_dict(self.eval_net.state_dict())
         self.learn_step_counter += 1
         b_s, b_a, b_r, b_s_, b_a_ = self.memory.sample()
         info(f'Sampled memory : s1: {b_s.shape} ; b_a: {b_a.shape} ; b_r: {b_r.shape} ; b_s_: {b_s_.shape} ; b_a_: {b_a_.shape}')
-        net_input = torch.cat((b_s, b_a), axis=1)
+        if self.select_mode == 'head':
+            net_input = torch.cat((b_s, b_a), axis=1)
+        else:
+            net_input = torch.cat((b_s, b_a), axis=1) #这里需要添加state_op emb,aka, memory 部分也得改？或者我如果不改，那么应该直接就能跑，把op-dim部分修一下
         q_eval = self.eval_net(net_input) # 8*64 128*128 矩阵维度不对应
         net_input_ = torch.cat((b_s_, b_a_), axis=1)
         q_next = self.target_net(net_input_)
