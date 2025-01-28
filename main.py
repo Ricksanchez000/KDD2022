@@ -115,7 +115,8 @@ def train(param):
     info(f'start training, the original performance is {old_per}')
     D_original = Dg.copy()
     steps_done = 0
-    FEATURE_LIMIT = Dg.shape[1] * param['enlarge_num']  # column number * 4
+    #FEATURE_LIMIT = Dg.shape[1] * param['enlarge_num']  # column number * 4
+    FEATURE_LIMIT = 20
     info(f'feature_limit = {FEATURE_LIMIT}')
     best_step = -1
     best_episode = -1
@@ -194,7 +195,7 @@ def train(param):
                     best_reward = current_reward
                 info(f'best reward of episdo {episode} is = {best_reward}')
                 episode_records.append({
-                    'episode': episode,
+                    'episode': episode + 1,
                     'current_reward': current_reward,
                     'best_reward': best_reward
                 })
@@ -210,7 +211,7 @@ def train(param):
             step += 1
         if episode % 5 == 0:
             info('Best performance is: {:.6f}'.format(np.max(best_per_opt)))
-            info('Episode {} ends!'.format(episode))
+            info('Episode {} ends!'.format())
         episode += 1
     info('Total training time for is: {:.1f}s'.format(time.time() -
                                                       training_start_time))
@@ -230,7 +231,6 @@ def train(param):
 
 
 if __name__ == '__main__':
-
     try:
         args = init_param()
         params = vars(args)
