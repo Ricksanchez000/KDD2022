@@ -183,15 +183,10 @@ def train(param):
                 cols = selector.get_support()
                 X_new = Dg.iloc[:, :-1].loc[:, cols]
                 Dg = pd.concat([X_new, Dg.iloc[:, -1]], axis=1)
-                current_reward = ENV.get_reward(Dg)
-                if current_reward > best_reward:
-                    best_reward = current_reward
-                info(f'best reward of episdo {episode} is = {best_reward}')
-                episode_records.append({
-                    'episode': episode + 1,
-                    'current_reward': current_reward,
-                    'best_reward': best_reward
-                })
+                #current_reward = ENV.get_reward(Dg)
+                #if current_reward > best_reward:
+                #    best_reward = current_reward
+
 
 
             info(
@@ -205,6 +200,14 @@ def train(param):
         if episode % 5 == 0:
             info('Best performance is: {:.6f}'.format(np.max(best_per_opt)))
             info('Episode {} ends!'.format(episode))
+
+        info(f'best reward of episdo {episode} is = {best_per}')
+        episode_records.append({
+            'episode': episode + 1,
+            #'current_reward': current_reward,
+            'current_reward': new_per,
+            'best_reward': best_per
+        })
         episode += 1
     info('Total training time for is: {:.1f}s'.format(time.time() -
                                                       training_start_time))
