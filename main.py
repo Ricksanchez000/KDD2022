@@ -216,7 +216,7 @@ def train(param):
         os.mkdir(D_OPT_PATH)
     out_name = param['out_put'] + '.csv'
     D_OPT.to_csv(os.path.join(D_OPT_PATH, out_name))
-    info(f'dataset {da} modeling finished !')
+    info(f'dataset :{NAME} modeling finished !')
     info(f'{out_name} is saved to {D_OPT_PATH}')
     print(records_df)
     records_df = pd.DataFrame(episode_records)
