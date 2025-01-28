@@ -204,7 +204,7 @@ def train(param):
             step += 1
         if episode % 5 == 0:
             info('Best performance is: {:.6f}'.format(np.max(best_per_opt)))
-            info('Episode {} ends!'.format())
+            info('Episode {} ends!'.format(episode))
         episode += 1
     info('Total training time for is: {:.1f}s'.format(time.time() -
                                                       training_start_time))
