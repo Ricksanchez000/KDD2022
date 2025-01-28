@@ -20,6 +20,16 @@ O1 = ['sqrt', 'square', 'sin', 'cos', 'tanh', 'stand_scaler',
       'minmax_scaler', 'quan_trans', 'sigmoid', 'log', 'reciprocal']
 O2 = ['+', '-', '*', '/']
 O3 = ['stand_scaler', 'minmax_scaler', 'quan_trans']
+
+'''
+O1 = ['sqrt', 'square', 'cos', 'sin', 'tanh', 
+      'cube', 'exp', 'sigmoid', 'log', 'reciprocal','minmax_scaler', 'quan_trans']
+
+O2 = ['+', '-', '*', '/']
+
+O3 = ['minmax_scaler', 'quan_trans']
+'''
+
 operation_set = O1 + O2
 one_hot_op = pd.get_dummies(operation_set)
 operation_emb = defaultdict()
