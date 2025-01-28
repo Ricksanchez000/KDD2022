@@ -229,6 +229,7 @@ class ClusterDQNNetwork(DQNNetwork):
                 print(f"Shape of state_emb: {state_emb.shape}; cluster_index {cluster_index}; shape of select_cluster_state: {select_cluster_state.shape}")
             else:
                 q_val = self.get_q_value(state_emb, select_cluster_state)#它最后是把这两个concate在了一起，然后送入网络中，select_cluster_state成为了ACTION_DIM
+
                 print(f"Shape of state_emb: {state_emb.shape}; cluster_index {cluster_index}; shape of select_cluster_state: {select_cluster_state.shape}") 
             q_vals.append(q_val.detach())  # th
             cluster_list.append(cluster_index)
@@ -283,6 +284,7 @@ class ClusterDQNNetwork(DQNNetwork):
         if self.cuda_info:
             op_emb = op_emb.cuda()
         state_op_emb = torch.cat((cached_state_embed, op_emb))
+        info(f'state_op_emb: {state_op_emb.shape}')
         q_vals, select_cluster_state_list, state_op_emb = self.forward(cached_state_emb=state_op_emb,
                                                                      cached_cluster_state=cached_cluster_state, for_next=for_next)  # act_probs: [bs, act_dim], state_value: [bs, 1]
         eps_threshold = self.EPS_END + (self.EPS_START - self.EPS_END
@@ -313,10 +315,11 @@ class ClusterDQNNetwork(DQNNetwork):
         self.learn_step_counter += 1
         b_s, b_a, b_r, b_s_, b_a_ = self.memory.sample()
         info(f'Sampled memory : s1: {b_s.shape} ; b_a: {b_a.shape} ; b_r: {b_r.shape} ; b_s_: {b_s_.shape} ; b_a_: {b_a_.shape}')
-        if self.select_mode == 'head':
-            net_input = torch.cat((b_s, b_a), axis=1)
-        else:
-            net_input = torch.cat((b_s, b_a), axis=1) #这里需要添加state_op emb,aka, memory 部分也得改？或者我如果不改，那么应该直接就能跑，把op-dim部分修一下
+        #if self.select_mode == 'head':
+        #    net_input = torch.cat((b_s, b_a), axis=1)
+        #else:
+        #    net_input = torch.cat((b_s, b_a), axis=1) #这里需要添加state_op emb,aka, memory 部分也得改？或者我如果不改，那么应该直接就能跑，把op-dim部分修一下
+        net_input = torch.cat((b_s, b_a), axis=1)
         q_eval = self.eval_net(net_input) # 8*64 128*128 矩阵维度不对应
         net_input_ = torch.cat((b_s_, b_a_), axis=1)
         q_next = self.target_net(net_input_)
