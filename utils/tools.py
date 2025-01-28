@@ -239,7 +239,7 @@ def downstream_task_cross_validataion(data, task_type):
 
 def test_task_new(Dg, task='cls'):
     X = Dg.iloc[:, :-1]
-    y = Dg.iloc[:, -1].astype(int)
+    y = Dg.iloc[:, -1].astype(int) #?
     if task == 'cls':
         clf = RandomForestClassifier(random_state=0)
         pre_list, rec_list, f1_list = [], [], []
