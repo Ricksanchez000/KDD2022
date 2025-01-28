@@ -120,6 +120,9 @@ def train(param):
     best_step = -1
     best_episode = -1
     training_start_time = time.time()
+
+    best_reward = float('-inf')  # 初始化为负无穷，表示最小值
+    episode_records = [] 
     while episode < EPISODES:
         step = 0
         Dg = D_original.copy()
@@ -186,6 +189,17 @@ def train(param):
                 cols = selector.get_support()
                 X_new = Dg.iloc[:, :-1].loc[:, cols]
                 Dg = pd.concat([X_new, Dg.iloc[:, -1]], axis=1)
+                current_reward = ENV.get_reward(Dg)
+                if current_reward > best_reward:
+                    best_reward = current_reward
+                info(f'best reward of episdo {episode} is = {best_reward}')
+                episode_records.append({
+                    'episode': episode,
+                    'current_reward': current_reward,
+                    'best_reward': best_reward
+                })
+
+
             info(
                 'New performance is: {:.6f}, Best performance is: {:.6f} (e{}s{}) Base performance is: {:.6f}'
                 .format(new_per, best_per, best_episode, best_step, base_per))
@@ -208,6 +222,11 @@ def train(param):
         os.mkdir(D_OPT_PATH)
     out_name = param['out_put'] + '.csv'
     D_OPT.to_csv(os.path.join(D_OPT_PATH, out_name))
+    info(f'{out_name} is saved to {D_OPT_PATH}')
+    print(records_df)
+    records_df = pd.DataFrame(episode_records)
+    records_df.to_csv(os.path.join(D_OPT_PATH, 'episode_rewards.csv'), index=False)
+
 
 
 if __name__ == '__main__':
