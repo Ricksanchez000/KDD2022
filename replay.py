@@ -46,6 +46,7 @@ class RandomClusterReplay(Replay):
         
         self.STATE_DIM = state_shape
         self.ACTION_DIM = state_shape
+        self.op_dim = op_dim
         if self.cuda_info:
             self.mem1 = self.mem1.cuda()
             self.mem2 = self.mem2.cuda()
@@ -53,21 +54,22 @@ class RandomClusterReplay(Replay):
 
     def store_transition(self, mems):
         s, a, r, s_, a_ = mems
+
         transition = np.hstack((s, a, [r], s_, a_)) #这里store好像是没什么问题，都是dim = 64
         index = self.memory_counter % self.MEMORY_CAPACITY
         self.memory[index, :] = transition
         self.memory_counter += 1
+        
 
     def sample(self):
         sample_index = self._sample()
         b_memory = self.memory[sample_index, :]
-        b_s = torch.FloatTensor(b_memory[:, :self.STATE_DIM])
-        b_a = torch.LongTensor(b_memory[:, self.STATE_DIM:self.STATE_DIM +
-                                                          self.ACTION_DIM])
-        b_r = torch.FloatTensor(b_memory[:, self.STATE_DIM + self.
-                                ACTION_DIM:self.STATE_DIM + self.ACTION_DIM + 1]) # only 1 slice，contails the simgle reward
-        b_s_ = torch.FloatTensor(b_memory[:, self.STATE_DIM + self.
-                                 ACTION_DIM + 1:self.STATE_DIM * 2 + self.ACTION_DIM + 1])
+        b_s = torch.FloatTensor(b_memory[:, :self.STATE_DIM + self.op_dim])
+        b_a = torch.LongTensor(b_memory[:, self.STATE_DIM + self.op_dim :self.STATE_DIM + self.op_dim
+                                                        +  self.ACTION_DIM])
+        b_r = torch.FloatTensor(b_memory[:, self.STATE_DIM + self.op_dim + self.
+                                ACTION_DIM:self.STATE_DIM + self.op_dim + self.ACTION_DIM + 1]) # only 1 slice，contails the simgle reward
+        b_s_ = torch.FloatTensor(b_memory[:, self.STATE_DIM + self.op_dim + self.ACTION_DIM + 1:self.STATE_DIM * 2 + self.op_dim*2 self.ACTION_DIM + 1])
         b_a_ = torch.LongTensor(b_memory[:, -self.ACTION_DIM:])
         return b_s, b_a, b_r, b_s_, b_a_
 
