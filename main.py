@@ -89,13 +89,6 @@ def train(param):
                                         gamma=0.99,
                                         device=cuda_info, init_w=init_w)
     
-    '''
-    model_cluster2 = ClusterDQNNetwork(state_dim=STATE_DIM, cluster_state_dim=STATE_DIM, hidden_dim=STATE_DIM * 2,
-                                        memory=cluster2_mem,
-                                        ent_weight=ENT_WEIGHT, select='tail',
-                                        gamma=0.99,
-                                        device=cuda_info, init_w=init_w)
-    '''
     model_op = OpDQNNetwork(state_dim=STATE_DIM, cluster_state_dim=STATE_DIM, hidden_dim=STATE_DIM * 2,
                              memory=op_mem, ent_weight=ENT_WEIGHT, gamma=0.99, device=cuda_info, init_w=init_w)
     if cuda_info:
@@ -116,7 +109,7 @@ def train(param):
     D_original = Dg.copy()
     steps_done = 0
     #FEATURE_LIMIT = Dg.shape[1] * param['enlarge_num']  # column number * 4
-    FEATURE_LIMIT = 20
+    FEATURE_LIMIT = 30
     info(f'feature_limit = {FEATURE_LIMIT}')
     best_step = -1
     best_episode = -1
@@ -170,9 +163,9 @@ def train(param):
                     model_cluster2.select_action(clusters_, Dg.values[:, :-1], feature_names,
                                                  op=op_name_, cached_state_embed=state_emb_,
                                                  cached_cluster_state=action_list_, for_next=True)
-                info(f'model_cluster 2 stored memory : s1: {state_emb2.shape} ; a1: {action_emb2.shape} ; r: {r_c2} ; s2: {state_emb2_.shape} ; a2: {action_emb2_.shape}')
+                #info(f'model_cluster 2 stored memory : s1: {state_emb2.shape} ; a1: {action_emb2.shape} ; r: {r_c2} ; s2: {state_emb2_.shape} ; a2: {action_emb2_.shape}')
                 model_cluster2.store_transition(state_emb2, action_emb2, r_c2, state_emb2_, action_emb2_) #s1, a1, r, s2, a2
-            info(f'model_cluster 1 stored memory : s1: {state_emb.shape} ; a1: {action_emb.shape} ; r: {r_c1} ; s2: {state_emb_.shape} ; a2: {action_emb_.shape}')
+            #info(f'model_cluster 1 stored memory : s1: {state_emb.shape} ; a1: {action_emb.shape} ; r: {r_c1} ; s2: {state_emb_.shape} ; a2: {action_emb_.shape}')
             model_cluster1.store_transition(state_emb, action_emb, r_c1, state_emb_, action_emb_)
             model_op.store_transition(action_emb, op, r_op, action_emb_)
             if model_cluster1.memory.memory_counter >= model_cluster1.memory.MEMORY_CAPACITY:
@@ -223,6 +216,7 @@ def train(param):
         os.mkdir(D_OPT_PATH)
     out_name = param['out_put'] + '.csv'
     D_OPT.to_csv(os.path.join(D_OPT_PATH, out_name))
+    info(f'dataset {da} modeling finished !')
     info(f'{out_name} is saved to {D_OPT_PATH}')
     print(records_df)
     records_df = pd.DataFrame(episode_records)
