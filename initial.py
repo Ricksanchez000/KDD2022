@@ -31,7 +31,7 @@ def init_param():
     'episodes for training')
     parser.add_argument('--steps', type=int, default=10, help=
     'steps for each episode')
-    parser.add_argument('--enlarge_num', type=int, default=4, help=
+    parser.add_argument('--enlarge_num', type=int, default=2, help=
     'feature space enlarge')
     parser.add_argument('--memory', type=int, default=8, help='memory capacity')
     parser.add_argument('--a', type=float, default=1, help='a')
