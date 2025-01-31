@@ -108,8 +108,8 @@ def train(param):
     info(f'start training, the original performance is {old_per}')
     D_original = Dg.copy()
     steps_done = 0
-    #FEATURE_LIMIT = Dg.shape[1] * param['enlarge_num']  # column number * 4
-    FEATURE_LIMIT = 50
+    FEATURE_LIMIT = Dg.shape[1] * param['enlarge_num']  # column number * enlarge_number
+    #FEATURE_LIMIT = 50
     info(f'feature_limit = {FEATURE_LIMIT}')
     best_step = -1
     best_episode = -1
