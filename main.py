@@ -206,12 +206,15 @@ def train(param):
             if model_op.memory.memory_counter >= model_op.memory.MEMORY_CAPACITY:
                 info('start to learn in model_op')
                 model_op.learn(optimizer_op)
+            start_time_feature_selection = time.time()
             if Dg.shape[1] > FEATURE_LIMIT: #当feature数量超过 column_num * 4 时，用mutual_info限定在这个范围内
                 selector = SelectKBest(mutual_info_regression, k=FEATURE_LIMIT)\
                     .fit(Dg.iloc[:, :-1], Dg.iloc[:, -1])
                 cols = selector.get_support()
                 X_new = Dg.iloc[:, :-1].loc[:, cols]
                 Dg = pd.concat([X_new, Dg.iloc[:, -1]], axis=1)
+            end_time_feature_selection = time.time()
+            info(f'Feature Selection 耗时: {end_time_feature_selection - start_time_feature_selection:.4f} s')
                 #current_reward = ENV.get_reward(Dg)
                 #if current_reward > best_reward:
                 #    best_reward = current_reward
