@@ -183,7 +183,10 @@ def train(param):
                 best_per = new_per
                 D_OPT = Dg.copy()
             old_per = new_per
+            start_time_cluster_buil2 = time.time()
             clusters_ = ENV.cluster_build(Dg.values[:, :-1], Dg.values[:, -1], cluster_num=3)
+            end_time_cluster_buil2 = time.time()
+            info(f'clusters = ENV.cluster_build2 耗时: {end_time_cluster_buil2 - start_time_cluster_buil2:.4f} s')
             acts_, action_emb_, f_names1_, f_cluster1_, action_list_, state_emb_ = \
                 model_cluster1.select_action(clusters_, Dg.values[:, :-1], feature_names, for_next=True)
             op_, op_name_ = model_op.select_operation(action_emb_, for_next=True)
