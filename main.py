@@ -124,24 +124,48 @@ def train(param):
         while step < STEPS:
             steps_done += 1
             step_start_time = time.time()
+
+            start_time_cluster_buil = time.time() 
             clusters = ENV.cluster_build(Dg.values[:, :-1], Dg.values[:, -1], cluster_num=3)
+            end_time_cluster_buil = time.time()
+            info(f'clusters = ENV.cluster_build 耗时: {start_time_cluster_buil - end_time_cluster_buil:.4f} s')
+
             info(f'current cluster : {clusters}')
+            
+            start_time_cluster1_action = time.time()
             acts1, action_emb, f_names1, f_cluster1, action_list, state_emb = \
                 model_cluster1.select_action(clusters=clusters, X=Dg.values[:, :-1], feature_names=feature_names, steps_done=steps_done)
+            end_time_cluster1_action = time.time()
+            info(f'model_cluster1.select_action 耗时: {start_time_cluster1_action - end_time_cluster1_action:.4f} s')
+            
             #研究这里返回的action_emb，看看是什么情况？
+            start_time_op_action = time.time()
             op, op_name = model_op.select_operation(action_emb, steps_done=steps_done)
+            end_time_op_action = time.time()
+            info(f'model_op.select_operation 耗时: {start_time_op_action - end_time_op_action:.4f} s')
 
             if op_name in O1:
+                start_time_unary_build = time.time()
                 Dg, is_op = model_cluster1.op(Dg, f_cluster1, f_names1, op_name)
+                end_time_unary_build = time.time()
+                info(f'unary build 耗时: {start_time_op_action - end_time_op_action:.4f} s')
                 if not is_op:
                     continue
             else:
+                start_time_cluster2_action = time.time()
                 acts2, action_emb2, f_names2, f_cluster2, _, state_emb2 = \
                     model_cluster2.select_action(clusters, Dg.values[:, :-1], feature_names,
                                                  op_name, cached_state_embed=state_emb, cached_cluster_state=action_list, steps_done=steps_done)
+                end_time_cluster2_action = time.time()
+                info(f'model_cluster2.select_action 耗时: {start_time_cluster2_action - end_time_cluster2_action:.4f} s')
+
                 if FEATURE_LIMIT * 4 < (f_cluster1.shape[1] * f_cluster2.shape[1]):
                     continue
+                start_time_binary_build = time.time()
                 Dg, is_op = model_cluster1.op(Dg, f_cluster1, f_names1, op_name, f_cluster2, f_names2)
+                start_time_binary_build = time.time()
+                info(f'binary build 耗时: {start_time_op_action - end_time_op_action:.4f} s')
+
                 if not is_op:
                     continue
             feature_names = list(Dg.columns)
