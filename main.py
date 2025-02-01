@@ -269,7 +269,7 @@ def train(param):
                                                                      time.time() - step_start_time))
             step_end_time = time.time()
             step_time = step_end_time - step_start_time
-            info('Current spend time for episode-{} is: {:.1f}s'.format(step_time))
+            #info('Current spend time for episode-{} is: {:.1f}s'.format(step_time))
 
             #collection of cluster build time per step
             two_cluster_build_time = cluster1_build_time + cluster2_buil_time
