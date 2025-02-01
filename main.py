@@ -286,7 +286,7 @@ def train(param):
             info(f'Agent_action_time: {Agent_action_time:.4f} s')
             info('Two_cluster build time is: {:.1f}s'.format(two_cluster_build_time))
             info(f'Downstream Task Reward Calculation: {time_reward:.4f} s')
-            info('Current spend time for episode-{} is: {:.1f}s'.format(step_time))
+            info(f'Current spend step time is: {step_time}')
 
             step += 1
         if episode % 5 == 0:
