@@ -117,6 +117,14 @@ def train(param):
 
     best_reward = float('-inf')  # 初始化为负无穷，表示最小值
     episode_records = [] 
+    
+    ##########collect Time Complexity Data For function blocks##################
+    Two_cluster_build_time_list = []
+    step_time_list = []
+    Agent_action_time_list = []
+    Reward_calculation_time_list = []
+
+
     while episode < EPISODES:
         step = 0
         Dg = D_original.copy()
@@ -128,21 +136,25 @@ def train(param):
             start_time_cluster_buil = time.time() 
             clusters = ENV.cluster_build(Dg.values[:, :-1], Dg.values[:, -1], cluster_num=3)
             end_time_cluster_buil = time.time()
-            info(f'clusters = ENV.cluster_build 耗时: {end_time_cluster_buil - start_time_cluster_buil:.4f} s')
+            cluster1_build_time = end_time_cluster_buil - start_time_cluster_buil
+            info(f'Cluster1 build 耗时: {end_time_cluster_buil - start_time_cluster_buil:.4f} s')
 
             info(f'current cluster : {clusters}')
             
-            start_time_cluster1_action = time.time()
+            start_time_cluster1_action1 = time.time()
             acts1, action_emb, f_names1, f_cluster1, action_list, state_emb = \
                 model_cluster1.select_action(clusters=clusters, X=Dg.values[:, :-1], feature_names=feature_names, steps_done=steps_done)
-            end_time_cluster1_action = time.time()
-            info(f'model_cluster1.select_action 耗时: {end_time_cluster1_action - start_time_cluster1_action:.4f} s')
+            end_time_cluster1_action1 = time.time()
+            time_clustter1_action1 = end_time_cluster1_action1 - start_time_cluster1_action1
+
+            info(f'model_cluster1.select_action1 耗时: {end_time_cluster1_action1 - start_time_cluster1_action1:.4f} s')
             
             #研究这里返回的action_emb，看看是什么情况？
-            start_time_op_action = time.time()
+            start_time_op_action1 = time.time()
             op, op_name = model_op.select_operation(action_emb, steps_done=steps_done)
-            end_time_op_action = time.time()
-            info(f'model_op.select_operation 耗时: {end_time_op_action - start_time_op_action:.4f} s')
+            end_time_op_action1 = time.time()
+            time_op_action1 = end_time_op_action1 - start_time_op_action1
+            info(f'model_op.select_operation1 耗时: {end_time_op_action1 - start_time_op_action1:.4f} s')
 
             if op_name in O1:
                 start_time_unary_build = time.time()
@@ -152,12 +164,13 @@ def train(param):
                 if not is_op:
                     continue
             else:
-                start_time_cluster2_action = time.time()
+                start_time_cluster2_action1 = time.time()
                 acts2, action_emb2, f_names2, f_cluster2, _, state_emb2 = \
                     model_cluster2.select_action(clusters, Dg.values[:, :-1], feature_names,
                                                  op_name, cached_state_embed=state_emb, cached_cluster_state=action_list, steps_done=steps_done)
-                end_time_cluster2_action = time.time()
-                info(f'model_cluster2.select_action 耗时: {end_time_cluster2_action - start_time_cluster2_action:.4f} s')
+                end_time_cluster2_action1 = time.time()
+                time_clustter2_action1 = end_time_cluster2_action1 - start_time_cluster2_action1
+                info(f'model_cluster2.select_action1 耗时: {end_time_cluster2_action1 - start_time_cluster2_action1:.4f} s')
 
                 if FEATURE_LIMIT * 4 < (f_cluster1.shape[1] * f_cluster2.shape[1]):
                     continue
@@ -170,9 +183,13 @@ def train(param):
                     continue
             feature_names = list(Dg.columns)
 
+            
             start_time_reward = time.time()
             new_per = ENV.get_reward(Dg)
             end_time_reward = time.time()
+            time_reward = end_time_reward - start_time_reward
+            Reward_calculation_time_list.append(time_reward)
+
             info(f'new_per = ENV.get_reward(Dg) 耗时: {end_time_reward - start_time_reward:.4f} s')
 
             reward = new_per - old_per #original ariticle design is using utility diff, but here is only using F1 and 1-RAE diff
@@ -186,7 +203,11 @@ def train(param):
             start_time_cluster_buil2 = time.time()
             clusters_ = ENV.cluster_build(Dg.values[:, :-1], Dg.values[:, -1], cluster_num=3)
             end_time_cluster_buil2 = time.time()
+            cluster2_buil_time = end_time_cluster_buil2 - start_time_cluster_buil2
             info(f'clusters = ENV.cluster_build2 耗时: {end_time_cluster_buil2 - start_time_cluster_buil2:.4f} s')
+
+            
+            start_time_action2 = time.time()
             acts_, action_emb_, f_names1_, f_cluster1_, action_list_, state_emb_ = \
                 model_cluster1.select_action(clusters_, Dg.values[:, :-1], feature_names, for_next=True)
             op_, op_name_ = model_op.select_operation(action_emb_, for_next=True)
@@ -197,6 +218,14 @@ def train(param):
                                                  cached_cluster_state=action_list_, for_next=True)
                 #info(f'model_cluster 2 stored memory : s1: {state_emb2.shape} ; a1: {action_emb2.shape} ; r: {r_c2} ; s2: {state_emb2_.shape} ; a2: {action_emb2_.shape}')
                 model_cluster2.store_transition(state_emb2, action_emb2, r_c2, state_emb2_, action_emb2_) #s1, a1, r, s2, a2
+            end_time_action2 = time.time()
+            
+            time_action2 = end_time_action2 - start_time_action2
+            time_action1 = time_clustter1_action1 + time_op_action1 + time_clustter2_action1
+            Agent_action_time = time_action1 + time_action2
+            Agent_action_time_list.append(Agent_action_time)
+            info(f'Agent_action_time: {Agent_action_time:.4f} s')
+
             #info(f'model_cluster 1 stored memory : s1: {state_emb.shape} ; a1: {action_emb.shape} ; r: {r_c1} ; s2: {state_emb_.shape} ; a2: {action_emb_.shape}')
             model_cluster1.store_transition(state_emb, action_emb, r_c1, state_emb_, action_emb_)
             model_op.store_transition(action_emb, op, r_op, action_emb_)
@@ -231,6 +260,27 @@ def train(param):
             best_per_opt.append(best_per)
             info('Current spend time for step-{} is: {:.1f}s'.format(step,
                                                                      time.time() - step_start_time))
+            step_end_time = time.time()
+            step_time = step_end_time - step_start_time
+            info('Current spend time for episode-{} is: {:.1f}s'.format(step_time))
+
+            #collection of cluster build time per step
+            two_cluster_build_time = cluster1_build_time + cluster2_buil_time
+            info('Two_cluster build time is: {:.1f}s'.format(two_cluster_build_time))
+            Two_cluster_build_time_list.append(two_cluster_build_time)
+
+            #collection of step time per step
+            step_time_list.append(step_time)
+
+            #operation time 
+
+            ###Time Complexity info log###
+            info('report 4 function block time consumption per step')
+            info(f'Agent_action_time: {Agent_action_time:.4f} s')
+            info('Two_cluster build time is: {:.1f}s'.format(two_cluster_build_time))
+            info(f'Downstream Task Reward Calculation: {time_reward:.4f} s')
+            info('Current spend time for episode-{} is: {:.1f}s'.format(step_time))
+
             step += 1
         if episode % 5 == 0:
             info('Best performance is: {:.6f}'.format(np.max(best_per_opt)))
