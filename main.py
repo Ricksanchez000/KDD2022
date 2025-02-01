@@ -140,12 +140,14 @@ def train(param):
             info(f'Cluster1 build 耗时: {end_time_cluster_buil - start_time_cluster_buil:.4f} s')
 
             info(f'current cluster : {clusters}')
-            
+
+            ######
+            start_time_action1 = time.time()
             start_time_cluster1_action1 = time.time()
             acts1, action_emb, f_names1, f_cluster1, action_list, state_emb = \
                 model_cluster1.select_action(clusters=clusters, X=Dg.values[:, :-1], feature_names=feature_names, steps_done=steps_done)
             end_time_cluster1_action1 = time.time()
-            time_clustter1_action1 = end_time_cluster1_action1 - start_time_cluster1_action1
+            #time_clustter1_action1 = end_time_cluster1_action1 - start_time_cluster1_action1
 
             info(f'model_cluster1.select_action1 耗时: {end_time_cluster1_action1 - start_time_cluster1_action1:.4f} s')
             
@@ -153,7 +155,7 @@ def train(param):
             start_time_op_action1 = time.time()
             op, op_name = model_op.select_operation(action_emb, steps_done=steps_done)
             end_time_op_action1 = time.time()
-            time_op_action1 = end_time_op_action1 - start_time_op_action1
+            #time_op_action1 = end_time_op_action1 - start_time_op_action1
             info(f'model_op.select_operation1 耗时: {end_time_op_action1 - start_time_op_action1:.4f} s')
 
             if op_name in O1:
@@ -169,7 +171,7 @@ def train(param):
                     model_cluster2.select_action(clusters, Dg.values[:, :-1], feature_names,
                                                  op_name, cached_state_embed=state_emb, cached_cluster_state=action_list, steps_done=steps_done)
                 end_time_cluster2_action1 = time.time()
-                time_clustter2_action1 = end_time_cluster2_action1 - start_time_cluster2_action1
+                #time_clustter2_action1 = end_time_cluster2_action1 - start_time_cluster2_action1
                 info(f'model_cluster2.select_action1 耗时: {end_time_cluster2_action1 - start_time_cluster2_action1:.4f} s')
 
                 if FEATURE_LIMIT * 4 < (f_cluster1.shape[1] * f_cluster2.shape[1]):
@@ -181,6 +183,11 @@ def train(param):
 
                 if not is_op:
                     continue
+            end_time_action1 = time.time()
+            time_action1 = end_time_action1 - start_time_action1
+            info(f'time_action1: {time_action1:.4f} s')
+            #####
+
             feature_names = list(Dg.columns)
 
             
@@ -221,7 +228,7 @@ def train(param):
             end_time_action2 = time.time()
             
             time_action2 = end_time_action2 - start_time_action2
-            time_action1 = time_clustter1_action1 + time_op_action1 + time_clustter2_action1
+            #time_action1 = time_clustter1_action1 + time_op_action1 + time_clustter2_action1
             Agent_action_time = time_action1 + time_action2
             Agent_action_time_list.append(Agent_action_time)
             info(f'Agent_action_time: {Agent_action_time:.4f} s')
