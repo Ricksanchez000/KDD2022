@@ -128,7 +128,7 @@ def train(param):
             start_time_cluster_buil = time.time() 
             clusters = ENV.cluster_build(Dg.values[:, :-1], Dg.values[:, -1], cluster_num=3)
             end_time_cluster_buil = time.time()
-            info(f'clusters = ENV.cluster_build 耗时: {start_time_cluster_buil - end_time_cluster_buil:.4f} s')
+            info(f'clusters = ENV.cluster_build 耗时: {end_time_cluster_buil - start_time_cluster_buil:.4f} s')
 
             info(f'current cluster : {clusters}')
             
@@ -136,19 +136,19 @@ def train(param):
             acts1, action_emb, f_names1, f_cluster1, action_list, state_emb = \
                 model_cluster1.select_action(clusters=clusters, X=Dg.values[:, :-1], feature_names=feature_names, steps_done=steps_done)
             end_time_cluster1_action = time.time()
-            info(f'model_cluster1.select_action 耗时: {start_time_cluster1_action - end_time_cluster1_action:.4f} s')
+            info(f'model_cluster1.select_action 耗时: {end_time_cluster1_action - start_time_cluster1_action:.4f} s')
             
             #研究这里返回的action_emb，看看是什么情况？
             start_time_op_action = time.time()
             op, op_name = model_op.select_operation(action_emb, steps_done=steps_done)
             end_time_op_action = time.time()
-            info(f'model_op.select_operation 耗时: {start_time_op_action - end_time_op_action:.4f} s')
+            info(f'model_op.select_operation 耗时: {end_time_op_action - start_time_op_action:.4f} s')
 
             if op_name in O1:
                 start_time_unary_build = time.time()
                 Dg, is_op = model_cluster1.op(Dg, f_cluster1, f_names1, op_name)
                 end_time_unary_build = time.time()
-                info(f'unary build 耗时: {end_time_op_action - start_time_op_action:.4f} s')
+                info(f'unary build 耗时: {end_time_unary_build - start_time_unary_build:.4f} s')
                 if not is_op:
                     continue
             else:
@@ -169,7 +169,12 @@ def train(param):
                 if not is_op:
                     continue
             feature_names = list(Dg.columns)
+
+            start_time_reward = time.time()
             new_per = ENV.get_reward(Dg)
+            end_time_reward = time.time()
+            info(f'new_per = ENV.get_reward(Dg) 耗时: {end_time_reward - start_time_reward:.4f} s')
+
             reward = new_per - old_per #original ariticle design is using utility diff, but here is only using F1 and 1-RAE diff
             r_c1, r_op, r_c2 = param['a'] * reward, param['b'] * reward, param['c'] * reward
             if new_per > best_per:
