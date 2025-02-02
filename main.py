@@ -282,7 +282,7 @@ def train(param):
             #operation time 
 
             ###Time Complexity info log###
-            info('report 4 function block time consumption per step')
+            info('###############report 4 function block time consumption per step##################')
             info(f'Agent_action_time: {Agent_action_time:.4f} s')
             info('Two_cluster build time is: {:.1f}s'.format(two_cluster_build_time))
             info(f'Downstream Task Reward Calculation: {time_reward:.4f} s')
